@@ -1,0 +1,954 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <title>لوحة مشرفات الكفالة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome للأيقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    .icon-container {
+  transform: scale(1);
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.icon-container:hover {
+  transform: scale(1.2); /* يعمل زوم إن */
+}
+
+    .back-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.back-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 28px;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.back-btn:hover {
+  color: #4caf50;
+}
+
+    .password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  padding: 10px 45px 10px 10px; /* زودت الـ padding يمين عشان يخلي مساحة للأيقونة */
+  height: 45px; /* خليناها أطول شوية */
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.password-container i {
+  position: absolute;
+  top: 50%;
+left:5px;  /* بعدناها شوية من الخط */
+  transform: translateY(-50%); 
+  cursor: pointer;
+  color: #555;
+  font-size: 20px; /* نكبرها شوية وتكون واضحة */
+  pointer-events: auto; /* يخليها قابلة للضغط */
+}
+
+
+
+    .highlighted {
+  border: 3px solid #f39c12 !important;
+  background-color: #fffbe6;
+  transition: background-color 0.5s, border 0.5s;
+}
+
+.edit-btn {
+  margin-left: 10px; /* أو right لو اللغة من اليمين */
+}
+
+.preview-btn {
+  margin-right: 10px;
+}
+
+    /* نافذة التعديل المنبثقة */
+.icon-button {
+  background-color: #f0f0f0;
+  border: none;
+  color: #333;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: #ddd;
+  transform: scale(1.1);
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+}
+    .filter-dropdown {
+  display: none;
+  position: absolute;
+  right: 0; /* تغيير من left إلى right للتنسيق مع الاتجاه RTL */
+  background-color: #fff;
+  min-width: 180px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.filter-dropdown a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: right;
+  font-family: 'Tajawal', sans-serif;
+  transition: background-color 0.3s;
+}
+
+.filter-dropdown a:hover {
+  background-color: #f0f0f0;
+  color: #004d26;
+}
+
+.filter-dropdown.show {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#projectPreview img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+
+
+    @media (max-width: 400px) {
+  .project-uploader h2 {
+    font-size: 1.2rem;
+  }
+
+  .project-uploader button {
+    font-size: 1rem;
+  }
+}
+
+    @media (max-width: 600px) {
+  .form-card {
+    padding: 15px;
+    margin: 15px 10px;
+    border-right: 4px solid #009688;
+  }
+
+  .form-card h3 {
+    font-size: 18px;
+  }
+
+  .form-card p {
+    font-size: 14px;
+  }
+
+  #previewImg {
+    height: 150px !important;
+  }
+}
+
+    .supervisor-title {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 20px;
+  color: black;
+  font-weight: bold;
+}
+
+    #announcementText {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  color: black;
+  font-weight: bold;
+}
+
+#announcementList > div {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: black;
+  font-weight: bold;
+}
+
+        body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* الخلفية المتحركة */
+    body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("https://i.postimg.cc/qBDG2sPG/Whats-App-Image-2025-06-16-at-17-38-27-6c039e71.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: -2; /* نغير الزد اندكس */
+  animation: moveBackground 30s infinite alternate ease-in-out;
+}
+
+  @keyframes moveBackground {
+  0%   { background-position: center center; }
+  25%  { background-position: top right; }
+  50%  { background-position: center left; }
+  75%  { background-position: bottom right; }
+  100% { background-position: center center; }
+}
+    /* شاشة اللودينق */
+#loaderScreen {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* دائرة متوهجة حول الشعار */
+.loader-border {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  padding: 10px;
+  background: conic-gradient(#004d26, #27ae60, #004d26);
+  animation: spin 2s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-border img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  background: white;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+ .project-uploader {
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+  margin: 40px auto;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+
+  .project-uploader h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .project-uploader input[type="text"],
+  .project-uploader input[type="file"] {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
+    background-color: white;
+  }
+
+  .project-uploader input[type="color"] {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border: none;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .project-uploader button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #6c63ff, #4e4cbf);
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  .project-uploader button:hover {
+    background: linear-gradient(to right, #574feb, #3f3cc5);
+    transform: translateY(-1px);
+  }
+    .login-box button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #004d26;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.login-box button:hover {
+  transform: scale(1.03);
+  background-color: #006b38;
+}
+
+    .supervisor-boxes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 30px auto;
+  max-width: 800px;
+}
+
+.supervisor-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a8e6cf, #56ab91);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  padding: 10px;
+  transition: transform 0.3s;
+  color: white;
+}
+
+.supervisor-circle:hover {
+  transform: scale(1.05);
+}
+
+.supervisor-circle h4 {
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+.supervisor-circle p {
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.supervisor-circle button {
+  background: white;
+  color: #004d26;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.form-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.form-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.form-card p {
+  font-size: 15px;
+  color: #000;
+  margin: 6px 0;
+}
+
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(to bottom, #e0ffe6, #a8e6cf);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #004d26;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .login-box {
+  background: rgba(255, 255, 255, 0.12); /* شفافية خفيفة */
+  backdrop-filter: blur(12px); /* ضبابية خلف البوكس */
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 30px;
+  width: 300px;
+  text-align: center;
+}
+
+
+    .login-box input, .login-box select, .login-box button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .supervisor-panel {
+      display: none;
+      padding: 20px;
+    }
+
+    button {
+      background-color: #004d26;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #cce8d8;
+    }
+  </style>
+</head>
+<body>
+
+<header>لوحة مشرفات الكفالة</header>
+
+<!-- زر رجوع عام -->
+<div id="backContainer" class="back-container">
+  <button class="back-btn" id="backBtn" title="رجوع"><i class="fa-solid fa-arrow-right-long"></i></button>
+</div>
+
+<!-- شاشة لودينج -->
+<div id="loaderScreen">
+  <div class="loader-border">
+    <img src="https://i.postimg.cc/qBDG2sPG/Whats-App-Image-2025-06-16-at-17-38-27-6c039e71.jpg" alt="شعار المنظمة" />
+  </div>
+</div>
+
+<!-- تسجيل الدخول -->
+<section id="loginSection" class="login-container">
+  <div class="login-box">
+    <h2>تسجيل الدخول</h2>
+
+    <input type="text" id="username" placeholder="اسم المستخدم" />
+
+    <div class="password-container">
+      <input type="password" id="password" placeholder="كلمة المرور" />
+      <i class="fa-solid fa-eye" id="togglePassword"></i>
+    </div>
+
+    <button onclick="login()">دخول</button>
+    <button onclick="window.location.href='https://bishatoshi.github.io/section/'">
+  قسم الإعلام
+</button>
+
+    <!-- زر مشرفة الحرف (تم إغلاقه صح) -->
+    <button onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSfzoYCJyEQF8QidBBC0aSEfkAvXlx144FjeQ8Md1R1jH0-n-g/viewform?usp=header','_blank')">
+      مشرفة الحرف
+    </button>
+  </div>
+</section>
+
+<!-- قسم الإعلام -->
+<section id="mediaSection">
+  <h3>📢 إضافة إعلان</h3>
+  <textarea id="announcementText" placeholder="اكتب الإعلان هنا..." style="width:100%;height:100px"></textarea><br/>
+  <button onclick="addAnnouncement()">➕ إضافة إعلان</button>
+
+  <h3 style="margin-top:30px;">📃 الإعلانات الحالية</h3>
+  <div id="announcementList"></div>
+
+  <div class="project-uploader">
+    <h2>إضافة مشروع جديد</h2>
+    <input type="text" id="projName" placeholder="اسم المشروع" oninput="previewProject()" />
+    <label>لون المشروع:</label>
+    <input type="color" id="projColor" value="#8e44ad" onchange="previewProject()" />
+    <label>وصف المشروع:</label>
+    <textarea id="projIntro" placeholder="اكتب وصفاً للمشروع..." oninput="previewProject()"></textarea>
+
+    <label for="projImage" style="display:inline-block;padding:5px 100px;background:#27ae60;color:#fff;border-radius:8px;cursor:pointer;font-weight:bold">رفع صورة</label>
+    <input type="file" id="projImage" accept="image/*" style="display:none" onchange="previewImage(event)" />
+
+    <button onclick="uploadProject()">رفع المشروع</button>
+
+    <div id="projectPreview" class="form-card" style="margin-top:25px;display:none">
+      <h3 id="previewTitle">اسم المشروع</h3>
+      <div style="width:100%;height:200px;border-radius:12px;overflow:hidden;background:#eee;margin-bottom:15px">
+        <img id="previewImg" src="" alt="">
+      </div>
+      <div class="preview-intro">
+        <h4>وصف المشروع:</h4>
+        <p id="previewIntro">لا يوجد وصف للمشروع</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- لوحة المشرف -->
+<section id="supervisorPanel">
+  <h3 id="supervisorWelcome" class="supervisor-title">مرحباً</h3>
+
+  <!-- أدوات فلترة وبحث -->
+  <div class="toolbar" id="toolbar">
+    <div class="filter-container" style="position:relative">
+      <button onclick="toggleFilter()" class="filter-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z" fill="white"/></svg>
+        فلترة
+      </button>
+      <div id="filterDropdown" class="filter-dropdown">
+        <a href="#" onclick="filterByGender('all')">الكل</a>
+        <a href="#" onclick="filterByGender('رجال')">رجال فقط</a>
+        <a href="#" onclick="filterByGender('نساء')">نساء فقط</a>
+      </div>
+    </div>
+
+    <input type="text" id="formSearchInput" placeholder="🔎 ابحث عن اسم أو أي كلمة..." style="flex:1;padding:12px;border-radius:10px;border:1px solid #ccc;font-size:16px" />
+  </div>
+
+  <div id="resultsCount" style="font-weight:bold;margin-bottom:10px"></div>
+
+  <!-- للمشرفات العامات لعرض باقي المشرفات -->
+  <h3 id="supervisorBoxesTitle" class="supervisor-title" style="display:none;text-align:center;margin-top:10px">👩‍💼 مشرفاتي</h3>
+  <div id="supervisorSelection" class="supervisor-boxes" style="display:none"></div>
+
+  <!-- الحاوية الأساسية للكروت -->
+  <div id="formsContainer">⏳ جاري تحميل الاستمارات...</div>
+
+  <!-- أزرار عامة -->
+  <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+    <button onclick="toggleEditSection()" style="background:#FFA500;border:none;color:#fff;padding:10px 16px;border-radius:10px;cursor:pointer">🛠 تعديل بيانات الدخول</button>
+    <button onclick="logout()" style="background:var(--brand-green);border:none;color:#fff;padding:10px 16px;border-radius:10px;cursor:pointer">🚪 تسجيل خروج</button>
+  </div>
+
+  <!-- نموذج تعديل الدخول -->
+  <div id="editSection" style="display:none;margin-top:20px;text-align:center">
+    <h3>🔐 تعديل بيانات الدخول</h3>
+    <input type="text" id="newUsername" placeholder="اسم المستخدم الجديد" />
+    <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" />
+    <button onclick="updateCredentials()" style="background:#27ae60;border:none;color:#fff;padding:10px 16px;border-radius:10px;cursor:pointer">تحديث البيانات</button>
+  </div>
+</section>
+
+<script>
+  
+  // إخفاء اللودر بعد قليل
+  window.addEventListener("load",()=>{ setTimeout(()=>{ const ld=document.getElementById("loaderScreen"); if(ld) ld.style.display="none"; },1500); });
+
+  // زر إظهار/إخفاء كلمة المرور
+  (function(){
+    const passwordInput=document.getElementById("password");
+    const togglePassword=document.getElementById("togglePassword");
+    togglePassword.addEventListener("click",function(){
+      const type=passwordInput.getAttribute("type")==="password"?"text":"password";
+      passwordInput.setAttribute("type",type);
+      this.classList.toggle("fa-eye"); this.classList.toggle("fa-eye-slash");
+    });
+  })();
+
+  // منطق إظهار/إخفاء الأقسام + رجوع
+  const backContainer=document.getElementById("backContainer");
+  const backBtn=document.getElementById("backBtn");
+  let historyStack=[];
+
+  function showSection(id){
+    // أخفي الكل
+    document.getElementById("loginSection").style.display="none";
+    document.getElementById("mediaSection").style.display="none";
+    document.getElementById("supervisorPanel").style.display="none";
+    // أظهر المطلوب
+    document.getElementById(id).style.display= id==="loginSection" ? "flex":"block";
+    // إدارة زر الرجوع
+    if(id==="loginSection"){ backContainer.style.display="none"; historyStack=[]; }
+    else { backContainer.style.display="block"; historyStack.push(id); }
+  }
+  backBtn.addEventListener("click",()=>{
+    historyStack.pop(); // الحالي
+    const prev = historyStack.pop() || "loginSection";
+    showSection(prev);
+  });
+
+  // قسم الإعلام
+  function openMediaSection(){ showSection("mediaSection"); }
+
+  // مشرفات من الشيت
+  let supervisorsReady=false;
+  const supervisors = { "samar":{password:"2222",letter:"all",gender:"all"}, "lamya":{password:"3333",letter:"all",gender:"all"} };
+
+  fetch("https://script.google.com/macros/s/AKfycbyag7q1kMjjt19My13T_kmoA-2cVoKjfu5qVPIGeCnx3ftII8f59QIPQfv3zVtssdV4eA/exec")
+    .then(res=>res.json())
+    .then(rows=>{
+      const cleaned = rows.map(r=>{
+        const o={}; Object.entries(r).forEach(([k,v])=>{
+          const kk = k.toString().trim().replace(/\s+/g,"").toLowerCase();
+          o[kk]= v? v.toString().trim() : "";
+        }); return o;
+      });
+
+      cleaned.forEach(u=>{
+        const username=u['اسمالمستخدم'];
+        const password=u['كلمتالسر'];
+        const rawLetters=u['الحرفالمشرفهعليه']||'all';
+        const letterArray=rawLetters.split(/[,،]/).map(x=>x.trim());
+        const genderArray=(u['مشرفهعلى']||'all').split(/[,،]/).map(x=>x.trim());
+        const kafalaType=(u['نوعالكفالة']||'basic').toLowerCase();
+        if(username && password){
+          supervisors[username.toLowerCase()]={ password, letter:letterArray, gender:genderArray, kafala:kafalaType };
+        }
+      });
+
+      supervisorsReady=true;
+      renderSupervisorBoxes();
+    });
+
+  function renderSupervisorBoxes(){
+    const container=document.getElementById("supervisorSelection");
+    container.innerHTML="";
+    Object.entries(supervisors).forEach(([user,info])=>{
+      if(user==="samar"||user==="lamya") return;
+      const label=`حرف ${Array.isArray(info.letter)?info.letter.join("، "):info.letter} (${Array.isArray(info.gender)?info.gender.join("، "):info.gender})`;
+      const title=user.charAt(0).toUpperCase()+user.slice(1);
+      const div=document.createElement("div");
+      div.className="supervisor-circle";
+      div.innerHTML=`
+        <h4>${title}</h4>
+        <p>${label}</p>
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:10px">
+          <button onclick="showSupervisorForms('${user}')">📂 معاينة</button>
+          <button style="background:#27ae60" onclick="window.open('https://docs.google.com/spreadsheets/d/1Tp0RKiPFwejosxD9RWKRtOwoLiLAzxP_GJyTUI-e7JM/edit?usp=sharing','_blank')">🛠 تعديل</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  }
+
+  // تسجيل الدخول
+  function login() {
+    const user = (document.getElementById("username").value || "").trim().toLowerCase();
+    const pass = (document.getElementById("password").value || "").trim();
+
+    if (user === "media" && pass === "123") {
+        showSection("mediaSection");
+        return;
+    }
+
+    if (supervisors[user] && supervisors[user].password === pass) {
+        const {letter, gender, kafala} = supervisors[user];
+        showSection("supervisorPanel");
+
+        const welcome = document.getElementById("supervisorWelcome");
+        const boxes = document.getElementById("supervisorSelection");
+        const boxesTitle = document.getElementById("supervisorBoxesTitle");
+        const forms = document.getElementById("formsContainer");
+        const toolbar = document.getElementById("toolbar");
+
+        if (user === "samar" || user === "lamya") {
+            welcome.textContent = "مشرفة عامة";
+            boxesTitle.style.display = "block";
+            boxes.style.display = "flex";
+            forms.innerHTML = "";
+            toolbar.style.display = "none";
+        } else {
+            boxesTitle.style.display = "none";
+            boxes.style.display = "none";
+            toolbar.style.display = "flex";
+            welcome.textContent = `مشرفة حرف ${Array.isArray(letter) ? letter.join("، ") : letter} (${Array.isArray(gender) ? gender.join("، ") : gender}) - نوع الكفالة: ${kafala}`;
+            loadForms(letter, gender);
+        }
+        return;
+    }
+
+    // بدل alert نستعمل Swal
+    Swal.fire({
+        title: 'خطأ!',
+        text: 'اسم المستخدم أو كلمة المرور غير صحيحة',
+        icon: 'error',
+        confirmButtonText: 'حاول مرة أخرى'
+    });
+}
+  function logout(){ showSection("loginSection"); document.getElementById("username").value=""; document.getElementById("password").value=""; }
+
+  // فلترة وبحث
+  let currentGenderFilter='all';
+  let currentSearchTerm='';
+
+  function toggleFilter(){ document.getElementById("filterDropdown").classList.toggle("show"); }
+  function filterByGender(g){ currentGenderFilter=g; applyFilters(); toggleFilter(); }
+
+  document.getElementById("formSearchInput").addEventListener("input",function(){ currentSearchTerm=this.value; applyFilters(); });
+
+  function applyFilters(){
+    const container=document.getElementById("formsContainer");
+    const cards=container.querySelectorAll(".form-card");
+    let visible=0;
+    cards.forEach(card=>{
+      const genderValue=card.getAttribute('data-gender')||'';
+      const text=card.textContent.toLowerCase();
+      const gMatch=(currentGenderFilter==='all')||genderValue.includes(currentGenderFilter);
+      const sMatch=!currentSearchTerm || text.includes(currentSearchTerm.toLowerCase());
+      card.style.display=(gMatch && sMatch)?"block":"none";
+      if(gMatch && sMatch) visible++;
+    });
+    document.getElementById("resultsCount").textContent=`عدد النتائج: ${visible}`;
+  }
+
+  // تظليل فـورم
+  function highlightForm(index){
+    const forms=document.querySelectorAll(".form-card");
+    if(forms[index]){
+      forms.forEach(f=>f.classList.remove("highlighted"));
+      forms[index].classList.add("highlighted");
+      forms[index].scrollIntoView({behavior:"smooth",block:"center"});
+    }
+  }
+
+  // تحميل الإعلانات
+  const scriptURL="https://script.google.com/macros/s/AKfycbwbSdqbgWq98xPfpxhvfsBf22v-QXxv120ODTAM0ha5J1oLmxAb8OEv5YLsT36i0EEtdg/exec";
+  function loadAnnouncements(){
+    fetch(scriptURL).then(r=>r.json()).then(data=>{
+      const c=document.getElementById("announcementList");
+      if(!data.length){ c.innerHTML="<p>لا توجد إعلانات حالياً.</p>"; return; }
+      c.innerHTML=data.map(item=>`
+        <div style="background:#d4f5dc;padding:10px;margin:10px 0;border-radius:8px">
+          📝 ${item.text}
+          <button onclick="deleteAnnouncement('${item.id}')" style="float:left;background:red;color:#fff;border:none;margin-left:5px;border-radius:6px;padding:4px 8px">🗑 حذف</button>
+          <button onclick="editAnnouncement('${item.id}','${(item.text||'').replace(/'/g,"\\'")}')" style="float:left;background:#ffa500;color:#fff;border:none;border-radius:6px;padding:4px 8px">✏️ تعديل</button>
+          <div style="clear:both"></div>
+        </div>`).join("");
+    });
+  }
+  function addAnnouncement(){
+    const t=(document.getElementById("announcementText").value||"").trim();
+    if(!t) return alert("اكتب نص الإعلان");
+    fetch(scriptURL,{method:"POST",body:JSON.stringify({action:"add",text:t})}).then(()=>{document.getElementById("announcementText").value="";loadAnnouncements();});
+  }
+  function deleteAnnouncement(id){
+    if(!confirm("هل أنت متأكد من الحذف؟")) return;
+    fetch(scriptURL,{method:"POST",body:JSON.stringify({action:"delete",id})}).then(loadAnnouncements);
+  }
+  function editAnnouncement(id,oldText){
+    const nt=prompt("اكتب الإعلان الجديد:",oldText); if(!nt) return;
+    fetch(scriptURL,{method:"POST",body:JSON.stringify({action:"edit",id,text:nt})}).then(loadAnnouncements);
+  }
+  loadAnnouncements();
+
+  // رفع مشروع + معاينة
+  const projectScriptURL="https://script.google.com/macros/s/AKfycbydeeZuWusfb4IKrgqJcIn8y98H0YWzaGEexB6vlLeJKYh4K8-4pAC9QPhlL8hSc3Lw/exec";
+  function previewProject(){
+    const name=document.getElementById("projName").value;
+    const color=document.getElementById("projColor").value;
+    const intro=document.getElementById("projIntro").value;
+    document.getElementById("previewTitle").textContent=name||"اسم المشروع";
+    document.getElementById("projectPreview").querySelector("div").style.backgroundColor=color;
+    document.getElementById("previewIntro").textContent=intro||"لا يوجد وصف للمشروع";
+    document.getElementById("projectPreview").style.display=name?"block":"none";
+  }
+  function previewImage(e){
+    const reader=new FileReader();
+    reader.onload=()=>{ document.getElementById('previewImg').src=reader.result; };
+    reader.readAsDataURL(e.target.files[0]);
+  }
+  function uploadProject(){
+    const name=(document.getElementById("projName").value||"").trim();
+    const color=document.getElementById("projColor").value;
+    const intro=(document.getElementById("projIntro").value||"").trim();
+    const file=document.getElementById("projImage").files[0];
+    if(!name) return alert("يرجى إدخال اسم المشروع");
+    if(file){
+      const r=new FileReader();
+      r.onload=(ev)=> sendToSheet(name,color,ev.target.result,intro);
+      r.readAsDataURL(file);
+    }else{
+      sendToSheet(name,color,"",intro);
+    }
+  }
+  function sendToSheet(name,color,imageBase64,introduction){
+    fetch(projectScriptURL,{method:'POST',body:JSON.stringify({name,color,imageBase64,introduction})})
+      .then(r=>r.text()).then(()=>{ alert("✅ تم رفع المشروع"); document.getElementById("projName").value=""; document.getElementById("projIntro").value=""; document.getElementById("projImage").value=""; document.getElementById("projectPreview").style.display="none";})
+      .catch(err=>{ console.error(err); alert("❌ حصل خطأ أثناء رفع المشروع"); });
+  }
+
+  // تحميل الاستمارات
+  function loadForms(letter,gender){
+    const container=document.getElementById("formsContainer");
+    container.innerHTML="⏳ جاري تحميل البيانات...";
+
+    fetch("https://script.google.com/macros/s/AKfycbzabNzAsuzgTV8ennhgf_4Tl6j_4QJUPGsuqE9g2Stj8tnD7E_xGwDY6d4mdhnjQu7x/exec")
+      .then(res=>res.json())
+      .then(data=>{
+        const isAll = (x)=> Array.isArray(x) ? (x.length===1 && x[0]==="all") : (x==="all");
+        const lettersArr = Array.isArray(letter)? letter : [letter];
+        const gendersArr = Array.isArray(gender)? gender : [gender];
+
+        const filtered = (isAll(lettersArr) && isAll(gendersArr)) ? data :
+          data.filter(item=>{
+            const name=(item['اسم الكفيل']||"").trim();
+            const firstLetter=name.normalize("NFD").replace(/[\u064B-\u065F\s]/g,"").charAt(0);
+            const g=(item['الجنس']||"").trim().replace(/أنثى|انثى/i,"نساء").replace(/ذكر/i,"رجال");
+            const letterMatch = isAll(lettersArr) || lettersArr.includes(firstLetter);
+            const genderMatch = isAll(gendersArr) || gendersArr.includes(g);
+            return letterMatch && genderMatch;
+          });
+
+        if(!filtered.length){ container.innerHTML="<p>لا توجد استمارات مطابقة.</p>"; return; }
+
+        const sheetLink="https://docs.google.com/spreadsheets/d/1UwffxEfnfmiOoGY4928c32vAWS0r4rzPda51PZf_yhM/edit?usp=sharing";
+        container.innerHTML=filtered.map((item,i)=>{
+          const g=(item['الجنس']||"").trim().replace(/أنثى|انثى/i,"نساء").replace(/ذكر/i,"رجال");
+          const fields=Object.entries(item).map(([k,v])=>{
+            if(k==='Timestamp'||k==='اسم الكفيل') return '';
+            const label=k.replace(' (اختياري)','').trim();
+            if(k==='تاريخ الانضمام' && v){
+              let formatted=v; const d=new Date(v);
+              if(!isNaN(d)){ const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear(); formatted=`${dd}/${mm}/${yy}`; }
+              return `<p style="background:#f9f9f9;padding:5px 10px;border-radius:6px;">• <strong>${label}:</strong> ${formatted}</p>`;
+            }
+            return `<p>• <strong>${label}:</strong> ${v||'—'}</p>`;
+          }).join("");
+
+          return `
+            <div class="form-card" data-gender="${g}">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                <p style="margin:0"><strong>${i+1} - ${item['اسم الكفيل']||'—'}</strong></p>
+                <a href="${sheetLink}" target="_blank" style="background:#27ae60;color:#fff;text-decoration:none;border:none;padding:6px 10px;border-radius:6px">✏️ تعديل من Google Sheet</a>
+              </div>
+              ${fields}
+            </div>`;
+        }).join("");
+
+        applyFilters();
+      })
+      .catch(err=>{
+        console.error(err);
+        container.innerHTML=`
+          <div class="form-card" style="background:#ffebee;border-right:4px solid #f44336">
+            <p><strong>حدث خطأ أثناء تحميل البيانات</strong></p>
+            <p>${err.message||'يرجى المحاولة لاحقًا'}</p>
+            <button onclick="location.reload()" style="background:var(--brand-green);color:#fff;padding:8px 15px;border:none;border-radius:6px;margin-top:10px">إعادة تحميل</button>
+          </div>`;
+      });
+  }
+
+  function showSupervisorForms(username){
+    const info=supervisors[username];
+    if(!info) return;
+    document.getElementById("supervisorBoxesTitle").style.display="none";
+    document.getElementById("supervisorSelection").style.display="none";
+    document.getElementById("toolbar").style.display="flex";
+    document.getElementById("formsContainer").style.display="block";
+    currentGenderFilter='all'; currentSearchTerm=''; document.getElementById("formSearchInput").value='';
+    loadForms(info.letter, info.gender);
+  }
+
+  // تعديل بيانات الدخول (placeholder)
+  function toggleEditSection(){
+    const s=document.getElementById("editSection");
+    s.style.display= s.style.display==="none" ? "block" : "none";
+  }
+  function updateCredentials(){ alert("تم التنفيذ صوريًا هنا. اربطه لاحقًا بGoogle Apps Script لحفظ القيم الجديدة."); }
+
+  // ابدأ من صفحة الدخول
+  showSection("loginSection");
+</script>
+
+</body>
+</html>
