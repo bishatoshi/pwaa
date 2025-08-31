@@ -1,0 +1,21 @@
+{
+  "name": "لوحة مشرفات الكفالة",
+  "short_name": "الكفالة",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#004d26",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/qBDG2sPG/Whats-App-Image-2025-06-16-at-17-38-27-6c039e71.jpg",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.postimg.cc/qBDG2sPG/Whats-App-Image-2025-06-16-at-17-38-27-6c039e71.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
